@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "chalk": "^5.1.2",
+    "discord.js": "^14.6.0",
+    "dotenv": "^16.0.3"
+  },
+  "name": "horadecodarbot",
+  "version": "1.0.0",
+  "description": "A simple Discord bot for the Hora de Codar community, created by Matheus Battisti.",
+  "main": "index.ts",
+  "repository": "https://github.com/MigPlayer6032/horadecodar_discordbot",
+  "author": "Miguel Tibincoski",
+  "license": "MIT",
+  "private": false
+}
