@@ -30,7 +30,7 @@ const client = new Discord.Client({
 })
 
 client.on('ready', () => {
-	console.success('Logged in as:', client.user.tag);
+	console.success('Logged in as:' + client.user.tag);
 
 		const commands = [
       {
@@ -45,6 +45,10 @@ client.on('ready', () => {
 		      }
 		    ]
 		  },
+			{
+		    name: 'rules',
+		    description: '📖 Read our rules!',
+		  }
 		];
 
 	const rest = new Discord.REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
@@ -94,7 +98,7 @@ client.on('interactionCreate', (interaction: Discord.InteractionTypes) => {
 				embeds: [{
 	            title: "New suggestion!",
 	            description: "Essas são as regras:\n\n🔴 **Respeite todos os membros;**\n🔴 **É proibido divulgar o conteúdo de outros cursos pagos**, caso você tenha algum bom motivo para isso mande DM para a equipe e avaliaremos;\n🔴 **Evite o flood**, este comportamento atrapalha o ambiente como um todo;\n🔴 **Se você ver algo que pareça errado avise a equipe de moderação**, isso serve para qualquer tipo de comportamento ou compartilhamento de conteúdo;\n🔴 As dúvidas devem ser enviadas no canal de <#1013959821814419567> , não precisa perguntar se alguem entende de alguma linguagem X ou Y, apenas coloque sua dúvida e especifique o máximo possível, adicione prints e detalhes;\n🔴 Utilize os canais off-topic para falar de assuntos não relacionados a programação;\n🔴 **Cuidado ao marcar as pessoas e grupos**, utilize apenas quando necessário, o abuso deste recurso pode resultar em ban.",
-	            color: 0x4321431,
+	            color: 0xff0000,
 	            url: "https://discord.com/users/" + interaction.user.id,
 	            author: {
 	                name: interaction.user.tag + " - ID: " + interaction.user.id,
