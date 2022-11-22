@@ -1,12 +1,11 @@
-import Discord from 'discord.js';
-import cli_color from 'cli-color';
-import { config as DotenvConfig } from 'dotenv';
+require("dotenv").config();
+const Discord = require("discord.js");
+const cli_color = require("cli-color");
 
-DotenvConfig()
 const oldLogger = console.log;
-console.warn = (data: string) => oldLogger(cli_color.yellow(data));
-console.info = (data: string) => oldLogger(cli_color.blue(data));
-console.success = (data: string) => oldLogger(cli_color.green(data));
+console.warn = (data) => oldLogger(cli_color.yellow(data));
+console.info = (data) => oldLogger(cli_color.blue(data));
+console.success = (data) => oldLogger(cli_color.green(data));
 
 const client = new Discord.Client({ 
 	intents: [
@@ -47,7 +46,23 @@ client.on('ready', () => {
 		  },
 			{
 		    name: 'rules',
-		    description: '📖 Read our rules!',
+		    description: 'Read our rules!',
+		  },
+			
+			{
+		    name: 'community_role',
+		    description: 'Get your Community Role!',
+				options: [{
+					name: 'email',
+					type: 3,
+					description: 'Field to enter your e-mail...',
+					required: true
+				}, {
+					name: 'message',
+					type: 3,
+					required: false,
+					description: 'A message to send with your role...'
+				}]
 		  }
 		];
 
@@ -66,7 +81,7 @@ client.on('ready', () => {
 	})()
 });
 
-client.on('interactionCreate', (interaction: Discord.InteractionTypes) => {
+client.on('interactionCreate', async (interaction) => {
 	if(interaction.isChatInputCommand() !== true) return;
 
 	switch (interaction.commandName){
@@ -108,9 +123,12 @@ client.on('interactionCreate', (interaction: Discord.InteractionTypes) => {
 				}]
 			})
 			break;
-
+		case "community_role": 
+			interaction.reply({ content: `Are you sure you want to receive the Community role? It is only for those who pay for the courses offered by Matheus Battisti!\n\nIf yes, confirm the information provided:\nE-mail: ${interaction.options.getString("email")}\nDiscord tag (obtained automatically): ${interaction.user.tag}\nMessage (optional): ${interaction.options.getString("message") || "Nothing to report"}` })
+			break;
 		default: 
 			interaction.reply({ content: "Não há sugestões para este comando." })
+			break;
 	}
 });
 

@@ -1,6 +1,5 @@
-compile = "./.config/build.sh"
-run = "node --enable-source-maps --trace-warnings .build/index.js"
-entrypoint = "index.ts"
+run = "node ./index.js"
+entrypoint = "index.js"
 
 [languages.typescript]
 pattern = "**/{*.ts,*.js,*.tsx,*.jsx}"
@@ -16,9 +15,6 @@ language = "nodejs"
 enabledForHosting = false
 packageSearch = true
 guessImports = true
-
-[env]
-XDG_CONFIG_HOME = "/home/runner/.config"
 
 [nix]
 channel = "stable-21_11"
