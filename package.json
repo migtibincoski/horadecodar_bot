@@ -1,17 +1,25 @@
 {
-  "dependencies": {
-    "chalk": "^5.1.2",
-    "cli-color": "^2.0.3",
-    "discord.js": "^14.6.0",
-    "dotenv": "^16.0.3",
-    "ts-node": "^10.9.1"
-  },
-  "name": "horadecodarbot",
-  "version": "1.0.0",
-  "description": "A simple Discord bot for the Hora de Codar community, created by Matheus Battisti.",
-  "main": "index.ts",
-  "repository": "https://github.com/MigPlayer6032/horadecodar_discordbot",
-  "author": "Miguel Tibincoski",
-  "license": "MIT",
-  "private": false
+    "dependencies": {
+        "chalk": "^5.1.2",
+        "cli-color": "^2.0.3",
+        "discord.js": "^14.6.0",
+        "dotenv": "^16.0.3",
+        "email-validator": "^2.0.4"
+    },
+    "name": "horadecodarbot",
+    "version": "1.0.0",
+    "description": "A simple Discord bot for the Hora de Codar community, created by Matheus Battisti.",
+    "main": "index.js",
+    "repository": "https://github.com/MigPlayer6032/horadecodar_discordbot",
+    "author": "Miguel Tibincoski",
+    "license": "MIT",
+    "private": false,
+    "scripts": {
+        "start:dev": "clear && node .",
+        "start:nodemon": "clear && npx nodemon"
+    },
+    "nodemonConfig": {
+        "ignore": ["**/node_modules/**", "**/.config/**", "**/.git/**", "**/index.js"],
+        "delay": 2500
+    }
 }
