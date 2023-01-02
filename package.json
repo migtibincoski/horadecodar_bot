@@ -15,7 +15,7 @@
     "license": "MIT",
     "private": false,
     "scripts": {
-        "start:dev": "clear && node .",
+        "start": "clear && node .",
         "start:nodemon": "clear && npx nodemon"
     },
     "nodemonConfig": {
