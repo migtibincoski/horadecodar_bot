@@ -16,10 +16,15 @@
     "private": false,
     "scripts": {
         "start": "clear && node .",
-        "start:nodemon": "clear && npx nodemon"
+        "dev": "clear && npx nodemon"
     },
     "nodemonConfig": {
-        "ignore": ["**/node_modules/**", "**/.config/**", "**/.git/**", "**/index.js"],
+        "ignore": [
+            "**/node_modules/**",
+            "**/.config/**",
+            "**/.git/**",
+            "**/index.js"
+        ],
         "delay": 2500
     }
 }

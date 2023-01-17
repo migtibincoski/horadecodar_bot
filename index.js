@@ -2,11 +2,20 @@ require("dotenv").config();
 const Discord = require("discord.js");
 const cli_color = require("cli-color");
 
+const debuggerWebhook = new Discord.WebhookClient({
+  url: `${process.env.DISCORD_DEBUG_WEBHOOK_URL}`,
+});
 const oldLogger = console.log;
 console.warn = (data) => oldLogger(cli_color.yellow(data));
 console.info = (data) => oldLogger(cli_color.blue(data));
 console.success = (data) => oldLogger(cli_color.green(data));
 console.clear();
+
+debuggerWebhook.send({
+  content: `\`\`\`${
+    process.env.IS_DEV_WORKSPACE === true ? "Development" : "Stable"
+  } bot starting...\`\`\``,
+});
 
 const client = new Discord.Client({
   intents: [
@@ -29,6 +38,24 @@ const client = new Discord.Client({
   restRequestTimeout: 99999,
 });
 
+client.on("debug", (data) => {
+  if (
+    data.includes("Sending a heartbeat.") ||
+    data.includes("Heartbeat acknowledged") ||
+    data.includes("Provided token")
+  )
+    return;
+  debuggerWebhook.send({
+    content: data,
+  });
+});
+
+process.on("unhandledRejection", (error) => {
+  debuggerWebhook.send({
+    content: `\`\`\`Diff\n- ${error}\`\`\``,
+  });
+});
+
 client.on("ready", () => {
   console.success("Logged in as: " + client.user.tag);
 
@@ -36,20 +63,6 @@ client.on("ready", () => {
     {
       name: "suggestion",
       description: "Give us a suggestion!",
-      options: [
-        {
-          name: "title",
-          type: 3,
-          description: "Field to enter your suggestion title...",
-          required: true,
-        },
-        {
-          name: "content",
-          type: 3,
-          description: "Field to enter your suggestion...",
-          required: true,
-        },
-      ],
     },
     {
       name: "rules",
@@ -84,41 +97,31 @@ client.on("ready", () => {
 client.on("interactionCreate", async (interaction) => {
   if (interaction.isChatInputCommand() === true) {
     if (interaction.commandName === "suggestion") {
-      const suggestionMessageObject = await client.channels.cache
-        .get(`${process.env.DISCORD_SUGGESTION_CHAT_ID}`)
-        .send({
-          content: `${Discord.userMention(interaction.user.id)}`,
-          embeds: [
-            {
-              title: "New Suggestion!",
-              description: interaction.options.getString("suggestion"),
-              color: 0x5109d9,
-              author: {
-                name: `${interaction.user.tag} - ${interaction.user.id}`,
-                avatar: `${interaction.user.displayAvatarURL({
-                  dynamic: true,
-                })}`,
-                url: `https://discord.com/users/${interaction.user.id}`,
-              },
-            },
-          ],
-        });
-      suggestionMessageObject.react("✅");
-      suggestionMessageObject.react("❌");
+      const roleModal = new Discord.ModalBuilder()
+        .setCustomId("suggestion_modal")
+        .setTitle("Send us a suggestion!");
 
-      const suggestionThread = await suggestionMessageObject.startThread({
-        name: `${interaction.options.getString("title")}`,
-        autoArchiveDuration: 60,
-        reason: `This thread was created to discuss the ${interaction.user.tag} suggestion.`,
-      });
-      suggestionThread.send({
-        content: `${interaction.user}, this thread was created to discuss your suggestion.`,
-      });
-      interaction.reply({
-        content:
-          "Thanks for your suggestion! It has been sent to the server administrators.",
-        ephemeral: true,
-      });
+      roleModal.addComponents(
+        new Discord.ActionRowBuilder().addComponents(
+          new Discord.TextInputBuilder()
+            .setCustomId("suggestion_modal_title")
+            .setLabel(
+              "Create a title for your suggestion:"
+            )
+            .setRequired(true)
+            .setStyle(Discord.TextInputStyle.Short)
+            .setMaxLength(100)
+        ),
+        new Discord.ActionRowBuilder().addComponents(
+          new Discord.TextInputBuilder()
+            .setCustomId("suggestion_modal_description")
+            .setLabel("Describe your suggestion:")
+            .setRequired(true)
+            .setStyle(Discord.TextInputStyle.Paragraph)
+            .setMaxLength(1024)
+        )
+      );
+      await interaction.showModal(roleModal);
     } else if (interaction.commandName === "rules") {
       interaction.reply({
         content: `${Discord.userMention(interaction.user.id)}`,
@@ -203,8 +206,54 @@ client.on("interactionCreate", async (interaction) => {
           Discord.userMention(interaction.user.id) +
           "' job requisition has been sent to administrators. Thanks!",
       });
+    } else if (interaction.customId === "suggestion_modal") {
+      const suggestionMessageObject = await client.channels.cache
+        .get(`${process.env.DISCORD_SUGGESTION_CHAT_ID}`)
+        .send({
+          content: `${Discord.userMention(interaction.user.id)}`,
+          embeds: [
+            {
+              title: `${interaction.fields.getTextInputValue(
+                "suggestion_modal_title"
+              )}`,
+              description: `${interaction.fields.getTextInputValue(
+                "suggestion_modal_description"
+              )}`,
+              author: {
+                name: "New Suggestion!",
+                icon_url: "https://cdn-icons-png.flaticon.com/512/32/32339.png",
+              },
+              footer: {
+                text:
+                  "This suggestion was submitted by " +
+                  interaction.user.tag +
+                  ".",
+                icon_url: `${interaction.user.displayAvatarURL({
+                  dynamic: true,
+                  size: 1024,
+                })}`,
+              },
+            },
+          ],
+        });
+      suggestionMessageObject.react("✅");
+      suggestionMessageObject.react("❌");
+
+      const suggestionThread = await suggestionMessageObject.startThread({
+        name: `${interaction.fields.getTextInputValue("suggestion_modal_title")}`,
+        autoArchiveDuration: 60,
+        reason: `This thread was created to discuss the ${interaction.user.tag} suggestion.`,
+      });
+      suggestionThread.send({
+        content: `${interaction.user}, this thread was created to discuss your suggestion.`,
+      });
+      interaction.reply({
+        content:
+          "Thanks for your suggestion! It has been sent to the server administrators.",
+        ephemeral: true,
+      });
     }
   }
 });
 
-(async () => await client.login(process.env.DISCORD_TOKEN))();
+(async () => await client.login(`${process.env.DISCORD_TOKEN}`))();
