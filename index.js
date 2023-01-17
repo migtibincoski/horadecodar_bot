@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Discord = require("discord.js");
 const cli_color = require("cli-color");
+const express = require("express")();
 
 const debuggerWebhook = new Discord.WebhookClient({
   url: `${process.env.DISCORD_DEBUG_WEBHOOK_URL}`,
@@ -13,7 +14,7 @@ console.clear();
 
 debuggerWebhook.send({
   content: `\`\`\`${
-    process.env.IS_DEV_WORKSPACE === true ? "Development" : "Stable"
+    process.env.IS_DEV_WORKSPACE === "true" ? "Development" : "Stable"
   } bot starting...\`\`\``,
 });
 
@@ -267,4 +268,15 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-(async () => await client.login(`${process.env.DISCORD_TOKEN}`))();
+client.login(`${process.env.DISCORD_TOKEN}`);
+
+// Simple Web Server
+express.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+express.post("/", (req, res) => {
+  res.json({
+    hello: "world!",
+  });
+});
+express.listen(process.env.IS_DEV_WORKSPACE === "true" ? 8000 : 80);

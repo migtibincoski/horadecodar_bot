@@ -4,7 +4,8 @@
         "cli-color": "^2.0.3",
         "discord.js": "^14.6.0",
         "dotenv": "^16.0.3",
-        "email-validator": "^2.0.4"
+        "email-validator": "^2.0.4",
+        "express": "^4.18.2"
     },
     "name": "horadecodarbot",
     "version": "1.0.0",
