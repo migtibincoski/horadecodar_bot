@@ -105,9 +105,7 @@ client.on("interactionCreate", async (interaction) => {
         new Discord.ActionRowBuilder().addComponents(
           new Discord.TextInputBuilder()
             .setCustomId("suggestion_modal_title")
-            .setLabel(
-              "Create a title for your suggestion:"
-            )
+            .setLabel("Create a title for your suggestion:")
             .setRequired(true)
             .setStyle(Discord.TextInputStyle.Short)
             .setMaxLength(100)
@@ -173,6 +171,17 @@ client.on("interactionCreate", async (interaction) => {
     }
   } else if (interaction.isModalSubmit() === true) {
     if (interaction.customId === "community_role_modal") {
+      if (
+        new RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}$/).test(
+          interaction.fields.getTextInputValue("role_modal_email")
+        ) === false
+      ) {
+        return interaction.reply({
+          content:
+            "The email you provided is invalid. Check that you wrote it correctly and try again.",
+          ephemeral: true,
+        });
+      }
       client.channels.cache
         .get(process.env.DISCORD_COMMUNITY_ROLE_CHAT_ID)
         .send({
@@ -240,7 +249,9 @@ client.on("interactionCreate", async (interaction) => {
       suggestionMessageObject.react("❌");
 
       const suggestionThread = await suggestionMessageObject.startThread({
-        name: `${interaction.fields.getTextInputValue("suggestion_modal_title")}`,
+        name: `${interaction.fields.getTextInputValue(
+          "suggestion_modal_title"
+        )}`,
         autoArchiveDuration: 60,
         reason: `This thread was created to discuss the ${interaction.user.tag} suggestion.`,
       });
