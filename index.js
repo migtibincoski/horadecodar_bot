@@ -279,4 +279,4 @@ express.post("/", (req, res) => {
     hello: "world!",
   });
 });
-express.listen(process.env.IS_DEV_WORKSPACE === "true" ? 8000 : 80);
+express.listen(8000);
